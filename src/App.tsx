@@ -1,14 +1,14 @@
-import './App.css'
-import { Button } from './components/ui/button'
+import "./App.css";
+import ProductDashboard from "./components/custom/ProductDetail";
+import Home from "./pages/Home";
 
 function App() {
-
   return (
-    <>
-     <h1 className='text-3xl font-bold'>Hello</h1>
-     <Button>Button</Button>
-    </>
-  )
+    <div className="font-sans">
+      <Home />
+      {/* <ProductDashboard/> */}
+    </div>
+  );
 }
 
-export default App
+export default App;
