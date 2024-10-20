@@ -38,6 +38,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useNavigate } from "react-router-dom";
 
 // Mock data
 const monthlySales = [
@@ -65,12 +66,13 @@ const topProducts = [
   { id: 5, name: "Bluetooth Speaker", sales: 650, rating: 4.4 },
 ];
 
-export default function HomeDashboard() {
+const Home = () => {
   const totalProducts = 1000;
   const totalSales = 500000;
   const totalReviews = 25000;
   const averageRating = 4.3;
   const salesGrowth = 15;
+  const navigate = useNavigate()
 
   return (
     <div className="container mx-auto p-4 space-y-4">
@@ -127,6 +129,40 @@ export default function HomeDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Performing Products</CardTitle>
+          <CardDescription>
+            Based on sales volume and customer ratings
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product Name</TableHead>
+                <TableHead>Sales</TableHead>
+                <TableHead>Rating</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {topProducts.map((product) => (
+                <TableRow key={product.id} onClick={() => navigate("/productId")} className="cursor-pointer">
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>{product.sales}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      <Star className="mr-1 h-4 w-4 fill-primary" />
+                      {product.rating}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
@@ -185,40 +221,6 @@ export default function HomeDashboard() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Performing Products</CardTitle>
-          <CardDescription>
-            Based on sales volume and customer ratings
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Sales</TableHead>
-                <TableHead>Rating</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {topProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.sales}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      <Star className="mr-1 h-4 w-4 fill-primary" />
-                      {product.rating}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -256,4 +258,6 @@ export default function HomeDashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;
