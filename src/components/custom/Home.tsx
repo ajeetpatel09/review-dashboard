@@ -39,6 +39,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useNavigate } from "react-router-dom";
+import { useGetAllProductsQuery } from "@/redux/api/productSlice";
+import BubbleLoader from "./Loader";
 
 // Mock data
 const monthlySales = [
@@ -58,26 +60,22 @@ const categoryDistribution = [
   { category: "Books", count: 100 },
 ];
 
-const topProducts = [
-  { id: 1, name: "Smartphone X Pro", sales: 1200, rating: 4.8 },
-  { id: 2, name: "Wireless Earbuds Y", sales: 980, rating: 4.6 },
-  { id: 3, name: "Smart Watch Z", sales: 850, rating: 4.7 },
-  { id: 4, name: "Laptop Ultra Slim", sales: 720, rating: 4.5 },
-  { id: 5, name: "Bluetooth Speaker", sales: 650, rating: 4.4 },
-];
-
 const Home = () => {
-  const totalProducts = 1000;
   const totalSales = 500000;
-  const totalReviews = 25000;
-  const averageRating = 4.3;
   const salesGrowth = 15;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const { data: allProducts, isLoading } = useGetAllProductsQuery();
+  console.log(allProducts);
+
+  if (isLoading || allProducts == undefined) {
+    return <BubbleLoader />;
+  }
 
   return (
     <div className="container mx-auto p-4 space-y-4">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Product Overview Dashboard</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-xl text-muted-foreground">
           All Products Performance
         </p>
@@ -92,7 +90,9 @@ const Home = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalProducts}</div>
+            <div className="text-2xl font-bold">
+              {allProducts.data.totalProducts}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -113,7 +113,7 @@ const Home = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {totalReviews.toLocaleString()}
+              {allProducts.data.totalReviews}
             </div>
           </CardContent>
         </Card>
@@ -125,7 +125,9 @@ const Home = () => {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{averageRating.toFixed(1)}</div>
+            <div className="text-2xl font-bold">
+              {allProducts.data.averageRating}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -147,14 +149,18 @@ const Home = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {topProducts.map((product) => (
-                <TableRow key={product.id} onClick={() => navigate("/productId")} className="cursor-pointer">
+              {allProducts.data.topRatedProducts?.map((product) => (
+                <TableRow
+                  key={product.productId}
+                  onClick={() => navigate(`/${product.productId}`)}
+                  className="cursor-pointer"
+                >
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.sales}</TableCell>
+                  <TableCell>193</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       <Star className="mr-1 h-4 w-4 fill-primary" />
-                      {product.rating}
+                      {product.avgRating}
                     </Badge>
                   </TableCell>
                 </TableRow>

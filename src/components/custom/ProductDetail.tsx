@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -8,12 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  BarChart3,
-  MessageSquare,
-  Star,
-  ThumbsUp,
-} from "lucide-react";
+import { BarChart3, MessageSquare, Star, ThumbsUp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -35,74 +29,57 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useParams } from "react-router-dom";
+import { useGetProductByIdQuery } from "@/redux/api/productSlice";
+import BubbleLoader from "./Loader";
 
-// Mock data
-const ratingDistribution = [
-  { rating: 5, count: 450 },
-  { rating: 4, count: 300 },
-  { rating: 3, count: 150 },
-  { rating: 2, count: 50 },
-  { rating: 1, count: 50 },
-];
-
-const sentimentTrend = [
-  { type: "Positive", count: 20 },
-  {
-    type: "Neutral",
-    count: 5,
-  },
-  { type: "Negative", count: 8 },
-];
-
-const improvements = [
-  { area: "Battery Life", percentage: 15 },
-  { area: "Camera Quality", percentage: 10 },
-  { area: "User Interface", percentage: 8 },
-];
-
-const commonIssues = [
-  { issue: "Slow Charging", count: 50 },
-  { issue: "App Crashes", count: 30 },
-  { issue: "Bluetooth Connectivity", count: 25 },
-];
-
-const recentReviews = [
-  {
-    id: 1,
-    user: "John D.",
-    rating: 4,
-    comment: "Great product, but battery life could be better.",
-  },
-  {
-    id: 2,
-    user: "Sarah M.",
-    rating: 5,
-    comment: "Absolutely love it! The camera quality is amazing.",
-  },
-  {
-    id: 3,
-    user: "Mike R.",
-    rating: 3,
-    comment: "Decent, but having issues with app crashes.",
-  },
-];
-const discrepancies = 60;
 
 export default function ProductDashboard() {
-  const [averageRating] = useState(4.2);
-  const [totalReviews] = useState(1000);
-  const [positivePercentage] = useState(85);
+  const { id } = useParams();
+  console.log("id", id);
+  if (!id || id == undefined) {
+    alert("Invalid route followed..");
+    return;
+  }
+
+  const { data: productData, isLoading } = useGetProductByIdQuery(id);
+  console.log("productData", productData);
+
+  if (isLoading || productData == undefined) {
+    return <BubbleLoader/>
+  }
+
+  const getPositiveSentimentPercentage = () => {
+    const totalSentimentCount = productData.data.sentimentsRatio.reduce(
+      (total, cur) => total + cur.count,
+      0
+    );
+
+    //make sure positive is set at 0th position.
+    const positive = productData.data.sentimentsRatio[0].count;
+    const positivePercentage = (positive / totalSentimentCount) * 100;
+    console.log("positivePercentage", positivePercentage);
+
+    return positivePercentage.toFixed(1);
+  };
+
+  const getDiscrepancyPercentage = () => {
+    const totalDiscrepancies = productData.data.discrepancies;
+    const totalReviews = productData.data.totalReviews;
+    const percentage = (totalDiscrepancies / totalReviews) * 100;
+    return percentage.toFixed(1);
+  };
 
   return (
     <div className="container mx-auto p-4 space-y-4">
       <header className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Product Dashboard</h1>
-          <p className="text-xl text-muted-foreground">SmartPhone X Pro</p>
+          <p className="text-xl text-muted-foreground">{productData.data.name}</p>
         </div>
         <Badge variant="outline" className="text-lg px-4 py-2">
           <Star className="mr-2 h-4 w-4 fill-primary" />
-          {averageRating.toFixed(1)}
+          {productData.data.averageRating}
         </Badge>
       </header>
 
@@ -113,7 +90,9 @@ export default function ProductDashboard() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalReviews}</div>
+            <div className="text-2xl font-bold">
+              {productData.data.totalReviews}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -124,7 +103,9 @@ export default function ProductDashboard() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{averageRating.toFixed(1)}</div>
+            <div className="text-2xl font-bold">
+              {productData.data.averageRating}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -135,7 +116,9 @@ export default function ProductDashboard() {
             <ThumbsUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{positivePercentage}%</div>
+            <div className="text-2xl font-bold">
+              {getPositiveSentimentPercentage()}%
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -152,7 +135,7 @@ export default function ProductDashboard() {
               ) : (
                 <ArrowDown className="inline mr-2 h-4 w-4 text-red-500" />
               )} */}
-              {discrepancies}%
+              {getDiscrepancyPercentage()}%
             </div>
           </CardContent>
         </Card>
@@ -174,7 +157,7 @@ export default function ProductDashboard() {
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={ratingDistribution}>
+                <BarChart data={productData.data.ratingDistribution}>
                   <XAxis dataKey="rating" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -199,7 +182,7 @@ export default function ProductDashboard() {
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={sentimentTrend}>
+                <LineChart data={productData.data.sentimentsRatio}>
                   <XAxis dataKey="type" />
                   <YAxis domain={[0, 1]} />
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -223,10 +206,10 @@ export default function ProductDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {improvements.map((item, index) => (
+              {productData.data.improvements?.map((item, index) => (
                 <li key={index} className="flex justify-between items-center">
-                  <span>{item.area}</span>
-                  <Badge variant="secondary">{item.percentage}%</Badge>
+                  <span>{item.improvement}</span>
+                  <Badge variant="secondary">{item.count}%</Badge>
                 </li>
               ))}
             </ul>
@@ -239,7 +222,7 @@ export default function ProductDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {commonIssues.map((item, index) => (
+              {productData.data.commonIssues.map((item, index) => (
                 <li key={index} className="flex justify-between items-center">
                   <span>{item.issue}</span>
                   <Badge variant="destructive">{item.count}</Badge>
@@ -264,16 +247,16 @@ export default function ProductDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentReviews.map((review) => (
-                <TableRow key={review.id}>
-                  <TableCell>{review.user}</TableCell>
+              {productData.data.recentReviews.map((review, index) => (
+                <TableRow key={index}>
+                  <TableCell>John Doe</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       <Star className="mr-1 h-4 w-4 fill-primary" />
                       {review.rating}
                     </Badge>
                   </TableCell>
-                  <TableCell>{review.comment}</TableCell>
+                  <TableCell>{review.reviewMessage.slice(0, 200)}...</TableCell>
                 </TableRow>
               ))}
             </TableBody>

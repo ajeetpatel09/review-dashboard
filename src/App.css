@@ -3,3 +3,16 @@
   --color-sentiment: #dc2626; /* Example hex color for sentiment line */
   --color-sales: #dc2626;
 }
+
+@keyframes bubble {
+  0%,
+  100% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+.animate-bubble {
+  animation: bubble 3s ease-in-out infinite;
+}
