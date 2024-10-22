@@ -126,7 +126,7 @@ const Home = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {allProducts.data.averageRating}
+              {allProducts.data.averageRating.toFixed(1)}
             </div>
           </CardContent>
         </Card>
@@ -160,7 +160,7 @@ const Home = () => {
                   <TableCell>
                     <Badge variant="outline">
                       <Star className="mr-1 h-4 w-4 fill-primary" />
-                      {product.avgRating}
+                      {product.avgRating.toFixed(1)}
                     </Badge>
                   </TableCell>
                 </TableRow>

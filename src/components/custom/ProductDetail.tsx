@@ -79,7 +79,7 @@ export default function ProductDashboard() {
         </div>
         <Badge variant="outline" className="text-lg px-4 py-2">
           <Star className="mr-2 h-4 w-4 fill-primary" />
-          {productData.data.averageRating}
+          {productData.data.averageRating.toFixed(1)}
         </Badge>
       </header>
 
@@ -104,7 +104,7 @@ export default function ProductDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {productData.data.averageRating}
+              {productData.data.averageRating.toFixed(1)}
             </div>
           </CardContent>
         </Card>
